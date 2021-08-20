@@ -2,9 +2,7 @@ package controller
 
 import (
 	"fmt"
-	"log"
 	"net/http"
-	"path"
 	"path/filepath"
 
 	"github.com/gin-gonic/gin"
