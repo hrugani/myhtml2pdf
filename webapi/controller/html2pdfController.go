@@ -25,7 +25,14 @@ func Convert(c *gin.Context) {
 	files := form.File["files"]
 
 	for _, file := range files {
-		filename := filepath.Base(file.Filename)
+
+		fmt.Printf("file received:  %#v \n\n", file)
+		c.String(
+			http.StatusOK,
+			fmt.Sprintf("file received:  %#v \n\n", file),
+		)
+			
+		filename := filepath.Base(file.Filename + "teste")
 		if err := c.SaveUploadedFile(file, filename); err != nil {
 			c.String(
 				http.StatusBadRequest,
