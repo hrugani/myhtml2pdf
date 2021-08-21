@@ -3,15 +3,13 @@ package controller
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"path/filepath"
 
 	"github.com/gin-gonic/gin"
 )
 
 func Convert(c *gin.Context) {
-
-	name := c.PostForm("name")
-	email := c.PostForm("email")
 
 	// Multipart form
 	form, err := c.MultipartForm()
@@ -26,13 +24,14 @@ func Convert(c *gin.Context) {
 
 	for _, file := range files {
 
-		fmt.Printf("file received:  %#v \n\n", file)
-		c.String(
-			http.StatusOK,
-			fmt.Sprintf("file received:  %#v \n\n", file),
-		)
+		// fmt.Printf("file received:  %#v \n\n", file)
+		// c.String(
+		// 	http.StatusOK,
+		// 	fmt.Sprintf("file received:  %#v \n\n", file),
+		// )
 
 		filename := filepath.Base(file.Filename + "_test111111")
+
 		if err := c.SaveUploadedFile(file, filename); err != nil {
 			c.String(
 				http.StatusBadRequest,
@@ -44,7 +43,9 @@ func Convert(c *gin.Context) {
 
 	c.String(
 		http.StatusOK,
-		fmt.Sprintf("Uploaded successfully %d files with fields name=%s and email=%s\n", len(files),
-			name,
-			email))
+		fmt.Sprintf("Uploaded successfully %d files\n", len(files)))
+}
+
+func createWorkDir() (*os.DirEntry, error) {
+	return nil, nil
 }
