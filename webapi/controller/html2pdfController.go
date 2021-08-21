@@ -31,8 +31,8 @@ func Convert(c *gin.Context) {
 			http.StatusOK,
 			fmt.Sprintf("file received:  %#v \n\n", file),
 		)
-			
-		filename := filepath.Base(file.Filename + "teste")
+
+		filename := filepath.Base(file.Filename + "_test111111")
 		if err := c.SaveUploadedFile(file, filename); err != nil {
 			c.String(
 				http.StatusBadRequest,
