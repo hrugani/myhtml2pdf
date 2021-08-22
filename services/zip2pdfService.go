@@ -1,7 +1,6 @@
 package services
 
-import "os"
 
-func Zip2Pdf(dir *os.DirEntry) ([]byte, error) {
+func Zip2Pdf(workdirName, filename string) ([]byte, error) {
 	return nil, nil
 }

@@ -1,9 +1,5 @@
 package services
 
-import (
-	"os"
-)
-
-func HtmlText2Pdf(f *os.DirEntry) ([]byte, error) {
+func HtmlText2Pdf(workDirName, fName string) ([]byte, error) {
 	return nil, nil
 }
