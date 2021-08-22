@@ -1,12 +1,18 @@
 package controller
 
 import (
+	"errors"
 	"fmt"
+	"log"
+	"mime/multipart"
 	"net/http"
 	"os"
+
 	"path/filepath"
+	"strings"
 
 	"github.com/gin-gonic/gin"
+	uuid "github.com/satori/go.uuid"
 )
 
 func Convert(c *gin.Context) {
@@ -16,12 +22,32 @@ func Convert(c *gin.Context) {
 	if err != nil {
 		c.String(
 			http.StatusBadRequest,
-			fmt.Sprintf("request err: %s", err.Error()+"\n"),
+			fmt.Sprintf("err: %s", err.Error()+"\n"),
 		)
 		return
 	}
 	files := form.File["files"]
 
+	err = validatePayload(files)
+	if err != nil {
+		c.String(
+			http.StatusBadRequest,
+			fmt.Sprintf("err: %s", err.Error()+"\n"),
+		)
+		return
+	}
+
+	// creates workdir
+	workDirName, err := createWorkDir()
+	if err != nil {
+		c.String(
+			http.StatusInternalServerError,
+			fmt.Sprintf("err creating local work dir: %s", err.Error()+"\n"),
+		)
+		return
+	}
+
+	var uploadedFileName string
 	for _, file := range files {
 
 		// fmt.Printf("file received:  %#v \n\n", file)
@@ -29,10 +55,10 @@ func Convert(c *gin.Context) {
 		// 	http.StatusOK,
 		// 	fmt.Sprintf("file received:  %#v \n\n", file),
 		// )
-
-		filename := filepath.Base(file.Filename + "_test111111")
-
-		if err := c.SaveUploadedFile(file, filename); err != nil {
+		pathSep := fmt.Sprintf("%c", os.PathSeparator)
+		uploadedFileName = filepath.Base(file.Filename)
+		fileNameInWorkDir := workDirName + pathSep + file.Filename
+		if err := c.SaveUploadedFile(file, fileNameInWorkDir); err != nil {
 			c.String(
 				http.StatusBadRequest,
 				fmt.Sprintf("upload file err: %s", err.Error()+"\n"),
@@ -41,11 +67,56 @@ func Convert(c *gin.Context) {
 		}
 	}
 
+	log.Default().Printf("file %v was uploaded and saved properly in the server", uploadedFileName)
+
+	// process the html to pdf conevtion
+
+	// Removes workdir
+	err = removeWorkDir(workDirName)
+	if err != nil {
+		log.Default().Printf("err on deliting used workdir %s", workDirName)
+	}
+
 	c.String(
 		http.StatusOK,
 		fmt.Sprintf("Uploaded successfully %d files\n", len(files)))
 }
 
-func createWorkDir() (*os.DirEntry, error) {
-	return nil, nil
+func createWorkDir() (string, error) {
+	uuid := uuid.NewV4().String()
+	err := os.Mkdir(uuid, 0755)
+	if err != nil {
+		return "", err
+	}
+	return uuid, nil
+}
+
+func removeWorkDir(name string) error {
+	err := os.RemoveAll(name)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+//  validateRequestContent validates if the number of uploaded files = 1 and  its suffixes are allowed
+func validatePayload(files []*multipart.FileHeader) error {
+
+	if len(files) == 0 {
+		return errors.New("no files uploaded in request")
+	}
+
+	if len(files) > 1 {
+		return errors.New("more than 1 file was uploaded")
+	}
+
+	allowedSuffixes := []string{".zip", ".html"}
+	for _, file := range files {
+		for _, suffix := range allowedSuffixes {
+			if strings.HasSuffix(strings.ToLower(file.Filename), suffix) {
+				return nil
+			}
+		}
+	}
+	return errors.New("invalid suffix of uploaded file name. Allows [.zip, .html]")
 }
