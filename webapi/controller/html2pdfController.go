@@ -31,6 +31,7 @@ func Convert(c *gin.Context) {
 
 	err = validatePayload(files)
 	if err != nil {
+		log.Default().Println(err)
 		c.String(
 			http.StatusBadRequest,
 			fmt.Sprintf("err: %s", err.Error()+"\n"),
@@ -71,17 +72,18 @@ func Convert(c *gin.Context) {
 	log.Default().Printf("file %v was uploaded and saved properly in the server", uploadedFileName)
 
 	// process the html to pdf conevtion
-	var pdfFilePath []byte = make([]byte, 0)
+	var pdfFilePath string
 	if strings.HasSuffix(strings.ToLower(uploadedFileName), ".zip") {
 		pdfFilePath, err = services.Zip2Pdf(workDirName, uploadedFileName)
 		if err != nil {
 			c.String(http.StatusBadRequest, fmt.Sprintf("upload file err: %s \n", err.Error()))
+			return
 		}
 	} else {
 		pdfFilePath, err = services.HtmlText2Pdf(workDirName, uploadedFileName)
 		if err != nil {
-			c.String(
-				http.StatusBadRequest, fmt.Sprintf("upload file err: %s", err.Error()+"\n"))
+			c.String(http.StatusBadRequest, fmt.Sprintf("upload file err: %s", err.Error()+"\n"))
+			return 
 		}
 	}
 
