@@ -71,34 +71,32 @@ func Convert(c *gin.Context) {
 
 	log.Default().Printf("file %v was uploaded and saved properly in the server", uploadedFileName)
 
-	// process the html to pdf conevtion
+	// process the html to pdf convertion
 	var pdfFilePath string
 	if strings.HasSuffix(strings.ToLower(uploadedFileName), ".zip") {
 		pdfFilePath, err = services.Zip2Pdf(workDirName, uploadedFileName)
 		if err != nil {
-			c.String(http.StatusBadRequest, fmt.Sprintf("upload file err: %s \n", err.Error()))
+			c.String(http.StatusInternalServerError, fmt.Sprintf("server error: %s \n", err.Error()))
 			return
 		}
 	} else {
 		pdfFilePath, err = services.HtmlText2Pdf(workDirName, uploadedFileName)
 		if err != nil {
-			c.String(http.StatusBadRequest, fmt.Sprintf("upload file err: %s", err.Error()+"\n"))
-			return 
+			c.String(http.StatusInternalServerError, fmt.Sprintf("server err: %s", err.Error()+"\n"))
+			return
 		}
 	}
 
 	// reponse: pdf file
-	_ = pdfFilePath
-	c.File(string("images/test.pdf"))
-	// c.String(
-	// 	http.StatusOK,
-	// 	fmt.Sprintf("Uploaded successfully %d files\n", len(files)))
+	c.File(string(pdfFilePath))
+	log.Default().Printf("html to pdf successful. pdf file generated: %s", pdfFilePath)
 
 	// Removes workdir
 	err = removeWorkDir(workDirName)
 	if err != nil {
 		log.Default().Printf("err on deliting used workdir %s", workDirName)
 	}
+	log.Default().Printf("executed clean up of workdir: %s", workDirName)
 
 }
 

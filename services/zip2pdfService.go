@@ -31,20 +31,21 @@ func Zip2Pdf(workdirName, filename string) (string, error) {
 	}
 
 	imagesFileNames := getImageFileNamesFromUnzipdFileNames(unzippedFilenames)
-	
+
 	// only if html contains images embed them.
 	if len(imagesFileNames) > 0 {
-		htmlFileName, err = imagesEmbeder(htmlFileName, imagesFileNames)
+		htmlFileName, err = imagesEmbedder(htmlFileName, imagesFileNames)
 		if err != nil {
 			return "", err
 		}
 	}
 
-	pdfFileFullName, err := convert(htmlFileName)
+	pdfFileFullName, err := wkhtmltopdfConvert(htmlFileName)
 	if err != nil {
 		return "", err
 	}
 
+	log.Default().Printf("service Zip2Pdf executed successfully. pdf file generated: %s", pdfFileFullName)
 	return pdfFileFullName, nil
 }
 
@@ -113,29 +114,6 @@ func changeCurrentDir(dirName string) error {
 	return nil
 }
 
-func embedImgsInHtml(unzipedFileNames []string) (string, error) {
-
-	file, err := os.Open(".")
-	if err != nil {
-		return "", err
-	}
-	defer file.Close()
-
-	htmlFileName, err := getHtmlFileNameFromUnzipedFileNames(unzipedFileNames)
-	if err != nil {
-		return "", err
-	}
-
-	imageFileNames:= getImageFileNamesFromUnzipdFileNames(unzipedFileNames)
-
-	newHtmlFileName, err := imagesEmbeder(htmlFileName, imageFileNames)
-	if err != nil {
-		return "", err
-	}
-
-	return newHtmlFileName, nil
-}
-
 func getHtmlFileNameFromUnzipedFileNames(fNames []string) (string, error) {
 	for _, name := range fNames {
 		if strings.HasSuffix(name, ".html") {
@@ -161,16 +139,6 @@ func getImageFileNamesFromUnzipdFileNames(fNames []string) []string {
 	}
 	return resp
 }
-
-
-func imagesEmbeder(htmlFileName string, imageFileNames []string) (string, error) {
-	return "", nil
-}
-
-func convert(htmlFileName string) (string, error) {
-	return "", nil
-}
-
 
 // func getHtmlFileName() (string, error) {
 
@@ -209,3 +177,25 @@ func convert(htmlFileName string) (string, error) {
 // 	return resp, nil
 // }
 
+// func embedImgsInHtml(unzipedFileNames []string) (string, error) {
+
+// 	file, err := os.Open(".")
+// 	if err != nil {
+// 		return "", err
+// 	}
+// 	defer file.Close()
+
+// 	htmlFileName, err := getHtmlFileNameFromUnzipedFileNames(unzipedFileNames)
+// 	if err != nil {
+// 		return "", err
+// 	}
+
+// 	imageFileNames := getImageFileNamesFromUnzipdFileNames(unzipedFileNames)
+
+// 	newHtmlFileName, err := imagesEmbeder(htmlFileName, imageFileNames)
+// 	if err != nil {
+// 		return "", err
+// 	}
+
+// 	return newHtmlFileName, nil
+// }
