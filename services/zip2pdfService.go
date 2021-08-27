@@ -20,15 +20,24 @@ func Zip2Pdf(workdirName, filename string) (string, error) {
 	}
 	defer changeCurrentDir("..")
 
-	unzipedFilenames, err := Unzip(filename, ".")
+	unzippedFilenames, err := Unzip(filename, ".")
 	if err != nil {
 		return "", err
 	}
-	_ = unzipedFilenames
 
-	htmlFileName, err := embedImgsInHtml()
+	htmlFileName, err := getHtmlFileNameFromUnzipedFileNames(unzippedFilenames)
 	if err != nil {
 		return "", err
+	}
+
+	imagesFileNames := getImageFileNamesFromUnzipdFileNames(unzippedFilenames)
+	
+	// only if html contains images embed them.
+	if len(imagesFileNames) > 0 {
+		htmlFileName, err = imagesEmbeder(htmlFileName, imagesFileNames)
+		if err != nil {
+			return "", err
+		}
 	}
 
 	pdfFileFullName, err := convert(htmlFileName)
@@ -104,7 +113,7 @@ func changeCurrentDir(dirName string) error {
 	return nil
 }
 
-func embedImgsInHtml() (string, error) {
+func embedImgsInHtml(unzipedFileNames []string) (string, error) {
 
 	file, err := os.Open(".")
 	if err != nil {
@@ -112,15 +121,12 @@ func embedImgsInHtml() (string, error) {
 	}
 	defer file.Close()
 
-	htmlFileName, err := getHtmlFileName()
+	htmlFileName, err := getHtmlFileNameFromUnzipedFileNames(unzipedFileNames)
 	if err != nil {
 		return "", err
 	}
 
-	imageFileNames, err := getImageFileNames()
-	if err != nil {
-		return "", err
-	}
+	imageFileNames:= getImageFileNamesFromUnzipdFileNames(unzipedFileNames)
 
 	newHtmlFileName, err := imagesEmbeder(htmlFileName, imageFileNames)
 	if err != nil {
@@ -130,42 +136,32 @@ func embedImgsInHtml() (string, error) {
 	return newHtmlFileName, nil
 }
 
-func getHtmlFileName() (string, error) {
-
-	file, err := os.Open(".")
-	if err != nil {
-		return "", err
-	}
-	defer file.Close()
-
-	fileList, _ := file.Readdirnames(0) // 0 to read all files and folders
-	for _, name := range fileList {
+func getHtmlFileNameFromUnzipedFileNames(fNames []string) (string, error) {
+	for _, name := range fNames {
 		if strings.HasSuffix(name, ".html") {
 			return name, nil
 		}
 	}
-
-	return "", errors.New("no html file present in uploaded data")
-
+	return "", errors.New("no html file don't present in uploaded data")
 }
 
-func getImageFileNames() ([]string, error) {
-	file, err := os.Open(".")
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	fileList, _ := file.Readdirnames(0) // 0 to read all files and folders
+func getImageFileNamesFromUnzipdFileNames(fNames []string) []string {
 	resp := []string{}
-	for _, name := range fileList {
-		if strings.HasSuffix(name, ".png") || strings.HasSuffix(name, ".jpg") {
+	for _, name := range fNames {
+		switch {
+		case strings.HasSuffix(name, ".png"):
+			resp = append(resp, name)
+		case strings.HasSuffix(name, ".jpg"):
+			resp = append(resp, name)
+		case strings.HasSuffix(name, ".jpeg"):
+			resp = append(resp, name)
+		case strings.HasSuffix(name, ".gif"):
 			resp = append(resp, name)
 		}
 	}
-
-	return resp, nil
+	return resp
 }
+
 
 func imagesEmbeder(htmlFileName string, imageFileNames []string) (string, error) {
 	return "", nil
@@ -174,3 +170,42 @@ func imagesEmbeder(htmlFileName string, imageFileNames []string) (string, error)
 func convert(htmlFileName string) (string, error) {
 	return "", nil
 }
+
+
+// func getHtmlFileName() (string, error) {
+
+// 	file, err := os.Open(".")
+// 	if err != nil {
+// 		return "", err
+// 	}
+// 	defer file.Close()
+
+// 	fileList, _ := file.Readdirnames(0) // 0 to read all files and folders
+// 	for _, name := range fileList {
+// 		if strings.HasSuffix(name, ".html") {
+// 			return name, nil
+// 		}
+// 	}
+
+// 	return "", errors.New("no html file present in uploaded data")
+
+// }
+
+// func getImageFileNames() ([]string, error) {
+// 	file, err := os.Open(".")
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	defer file.Close()
+
+// 	fileList, _ := file.Readdirnames(0) // 0 to read all files and folders
+// 	resp := []string{}
+// 	for _, name := range fileList {
+// 		if strings.HasSuffix(name, ".png") || strings.HasSuffix(name, ".jpg") {
+// 			resp = append(resp, name)
+// 		}
+// 	}
+
+// 	return resp, nil
+// }
+
