@@ -2,9 +2,13 @@ package services
 
 import (
 	"encoding/base64"
+	"io"
 	"log"
 	"net/http"
 	"os"
+	"strings"
+
+	"github.com/antchfx/htmlquery"
 )
 
 func imagesEmbedder(htmlFileName string, imageFileNames []string) (string, error) {
@@ -15,50 +19,125 @@ func imagesEmbedder(htmlFileName string, imageFileNames []string) (string, error
 	}
 	html := string(content)
 
-	imgTags, err := getAllImgTags(&html)
+	imgSrcs, err := getAllImgSources(&html)
 	if err != nil {
 		return "", err
 	}
 
-	replaceMap, err := getReplaceMap(imgTags, imageFileNames)
+	replaceMap, err := getReplaceMap(imgSrcs, imageFileNames)
 	if err != nil {
 		return "", nil
 	}
 
-	for imgTag, imgBase64 := range replaceMap {
-		html = embedImageInHtml(imgTag, imgBase64, html)
+	for imgsrc, imgBase64 := range replaceMap {
+		html = embedImageInHtml(imgsrc, imgBase64, html)
 	}
 
-	return "", nil
+	newHtmlFileName := createNewHtmlFileName(htmlFileName)
+
+	err = writeHtmlToFile(newHtmlFileName, html)
+	if err != nil {
+		return "", err
+	}
+
+	return newHtmlFileName, nil
 }
 
-func getAllImgTags(html *string) ([]*string, error) {
-	//todo
-	return nil, nil
+func createNewHtmlFileName(oldHtmlFileName string) string {
+	basename := strings.TrimSuffix(oldHtmlFileName, ".html")
+	return basename + "_base64_images" + ".html"
 }
 
-func embedImageInHtml(imgTag *string, imgBase64 *string, html string) string {
-	//todo
-	return ""
+func writeHtmlToFile(filepath, s string) error {
+	fo, err := os.Create(filepath)
+	if err != nil {
+		return err
+	}
+	defer fo.Close()
+
+	_, err = io.Copy(fo, strings.NewReader(s))
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
-func getReplaceMap(imgTags []*string, imagesFileNames []string) (map[*string]*string, error) {
+func getAllImgSources(html *string) ([]*string, error) {
 
-	imgTagImgFileNameMap, err := getImgTagImgFileNameMap(imgTags, imagesFileNames)
+	// doc, err := htmlquery.LoadDoc(*html)
+	doc, err := htmlquery.Parse(strings.NewReader((*html)))
 	if err != nil {
 		return nil, err
 	}
 
-	resp := make(map[*string]*string)
-	for imgTag, fileName := range imgTagImgFileNameMap {
-		resp[imgTag] = calcImageBase64String(fileName)
+	imgs, err := htmlquery.QueryAll(doc, "//img")
+	if err != nil {
+		return nil, err
+	}
+
+	resp := []*string{}
+	for _, img := range imgs {
+		src := htmlquery.SelectAttr(img, "src")
+		resp = append(resp, &src)
 	}
 
 	return resp, nil
 }
 
-func getImgTagImgFileNameMap(imgTags []*string, imageFileNames []string) (map[*string]string, error) {
-	return nil, nil
+func embedImageInHtml(imgsrc *string, imgBase64 *string, html string) string {
+
+	resp := strings.ReplaceAll(html, *imgsrc, *imgBase64)
+
+	return resp
+}
+
+func getReplaceMap(imgSrcs []*string, imagesFileNames []string) (map[*string]*string, error) {
+
+	imgSrcUploadedFileNameMap, err := buildImgSrcUploadedFileNameMap(imgSrcs, imagesFileNames)
+	if err != nil {
+		return nil, err
+	}
+
+	resp := make(map[*string]*string)
+	for imgSrc, fileName := range imgSrcUploadedFileNameMap {
+		resp[imgSrc] = calcImageBase64String(fileName)
+	}
+
+	return resp, nil
+}
+
+func buildImgSrcUploadedFileNameMap(imgSrcs []*string, imageFileNames []string) (map[*string]string, error) {
+	resp := map[*string]string{}
+	for _, uploadedFileName := range imageFileNames {
+		src := discoverAssociatedHtmlImgSrc(uploadedFileName, imgSrcs)
+		if src != nil {
+			resp[src] = uploadedFileName
+		}
+	}
+	return resp, nil
+}
+
+func discoverAssociatedHtmlImgSrc(fName string, imgSrcs []*string) *string {
+
+	// try exact matching
+	respExactMatching := exactMatching(fName, imgSrcs)
+	if respExactMatching != nil {
+		return respExactMatching
+	}
+
+	// try pattern 'ID=<number>' where number = image ID
+
+	return nil
+}
+
+func exactMatching(fName string, imgSrcs []*string) *string {
+	for _, imgsrc := range imgSrcs {
+		if fName == *imgsrc {
+			return imgsrc
+		}
+	}
+	return nil
 }
 
 func calcImageBase64String(fName string) *string {
@@ -67,7 +146,6 @@ func calcImageBase64String(fName string) *string {
 	if err != nil {
 		log.Default().Printf("error reading file: %s", fName)
 	}
-
 
 	var base64Encoding string
 
