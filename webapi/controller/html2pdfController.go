@@ -7,6 +7,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
+	"os/exec"
 
 	"path/filepath"
 	"strings"
@@ -101,11 +102,22 @@ func Convert(c *gin.Context) {
 }
 
 func createWorkDir() (string, error) {
+
 	uuid := uuid.NewV4().String()
-	err := os.Mkdir(uuid, 0755)
+
+	// err := os.Mkdir(uuid, 0777)
+	// if err != nil {
+	// 	return "", err
+	// }
+	// return uuid, nil
+
+	cmd := fmt.Sprintf("mkdir %s", uuid)
+	out, err := exec.Command(cmd).Output()
 	if err != nil {
 		return "", err
 	}
+	cmdOut := string(out)
+	_ = cmdOut
 	return uuid, nil
 }
 

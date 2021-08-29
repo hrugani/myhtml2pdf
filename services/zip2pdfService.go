@@ -40,7 +40,7 @@ func Zip2Pdf(workdirName, filename string) (string, error) {
 		}
 	}
 
-	pdfFileFullName, err := wkhtmltopdfConvert(htmlFileName)
+	pdfFileFullName, err := wkhtmltopdfConvert(workdirName, htmlFileName)
 	if err != nil {
 		return "", err
 	}
