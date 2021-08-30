@@ -45,7 +45,7 @@ func Zip2Pdf(workdirName, filename string) (string, error) {
 		return "", err
 	}
 
-	log.Default().Printf("service Zip2Pdf executed successfully. pdf file generated: %s", pdfFileFullName)
+	log.Default().Println("service Zip2Pdf executed successfully")
 	return pdfFileFullName, nil
 }
 
