@@ -3,6 +3,8 @@ package services
 import (
 	"errors"
 	"fmt"
+	"log"
+	"runtime"
 
 	// "log"
 	"os"
@@ -16,11 +18,20 @@ func wkhtmltopdfConvert(workDirName, htmlFileName string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	defer outFile.Close()
 	errFile, err := os.Create("err.log")
 	if err != nil {
 		return "", err
 	}
-	cmd := exec.Command("../wkhtmltopdf", htmlFileName, "output.pdf")
+	defer errFile.Close()
+
+	cmdName := "../wkhtmltopdf"
+	if isWindows() {
+		cmdName = "../wkhtmltopdf.exe"
+		log.Default().Printf("Windows detected: comand name to be used: %s", cmdName)
+	}
+
+	cmd := exec.Command(cmdName, htmlFileName, "output.pdf")
 	cmd.Stdout = outFile
 	cmd.Stderr = errFile
 	err = cmd.Start()
@@ -35,4 +46,9 @@ func wkhtmltopdfConvert(workDirName, htmlFileName string) (string, error) {
 
 	resp := fmt.Sprintf("%s/output.pdf", workDirName)
 	return resp, nil
+}
+
+func isWindows() bool {
+	os := runtime.GOOS
+	return os == "windows"
 }

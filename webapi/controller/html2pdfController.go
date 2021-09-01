@@ -59,8 +59,9 @@ func Convert(c *gin.Context) {
 		// )
 		pathSep := fmt.Sprintf("%c", os.PathSeparator)
 		uploadedFileName = filepath.Base(file.Filename)
-		fileNameInWorkDir := workDirName + pathSep + file.Filename
+		fileNameInWorkDir := workDirName + pathSep + uploadedFileName
 		if err := c.SaveUploadedFile(file, fileNameInWorkDir); err != nil {
+			log.Default().Printf("[ERROR] saving %s", fileNameInWorkDir)
 			c.String(
 				http.StatusBadRequest,
 				fmt.Sprintf("upload file err: %s", err.Error()+"\n"),
@@ -109,11 +110,15 @@ func createWorkDir() (string, error) {
 		return "", err
 	}
 
+	log.Default().Println("workdir was created")
+
 	err = os.Chmod(uuid, 0777)
 	if err != nil {
 		return "", err
 	}
-	
+
+	log.Default().Println("chmod was applyed on workdir")
+
 	return uuid, nil
 
 	// // cmd := fmt.Sprintf("mkdir %s", uuid)
