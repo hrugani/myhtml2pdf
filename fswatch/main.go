@@ -2,8 +2,7 @@ package main
 
 import "fmt"
 
-
-func main () {
+func main() {
+	//not implemented yet
 	fmt.Println("this is a seed for fswatch approach....")
 }
-

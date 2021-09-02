@@ -21,83 +21,92 @@ func Convert(c *gin.Context) {
 	// Multipart form
 	form, err := c.MultipartForm()
 	if err != nil {
-		c.String(
-			http.StatusBadRequest,
-			fmt.Sprintf("err: %s", err.Error()+"\n"),
-		)
+		msgErr := fmt.Sprintf("[ERROR] receiving request. detail: %s ", err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"code": http.StatusBadRequest, "message": msgErr})
+		// c.String(
+		// 	http.StatusBadRequest,
+		// 	fmt.Sprintf("err: %s", err.Error()+"\n"),
+		// )
 		return
 	}
 	files := form.File["files"]
+	log.Default().Println("[INFO] multipart form request was received successfully")
 
 	err = validatePayload(files)
 	if err != nil {
-		log.Default().Println(err)
-		c.String(
-			http.StatusBadRequest,
-			fmt.Sprintf("err: %s", err.Error()+"\n"),
-		)
+		msgErr := "[ERROR] validating pyload. detail: " + err.Error()
+		log.Default().Println(msgErr)
+		c.JSON(http.StatusBadRequest, gin.H{"code": http.StatusBadRequest, "message": msgErr})
+		// c.String(
+		// 	http.StatusBadRequest,
+		// 	fmt.Sprintf("err: %s", err.Error()+"\n"),
+		// )
 		return
 	}
+	log.Default().Println("[INFO]", "payload was validated")
 
 	// creates workdir
 	workDirName, err := createWorkDir()
 	if err != nil {
-		c.String(
-			http.StatusInternalServerError,
-			fmt.Sprintf("err creating local work dir: %s", err.Error()+"\n"),
-		)
+		msgErr := "[ERROR] creating workdir. detail: " + err.Error()
+		log.Default().Println(msgErr)
+		c.JSON(http.StatusInternalServerError, gin.H{"code": http.StatusInternalServerError, "message": msgErr})
+		// c.String(
+		// 	http.StatusInternalServerError,
+		// 	fmt.Sprintf("err creating local work dir: %s", err.Error()+"\n"),
+		// )
 		return
 	}
+	log.Default().Printf("[INFO] workdir %s was created", workDirName)
 
+	// save uplopded file in the workdir
 	var uploadedFileName string
 	for _, file := range files {
-
-		// fmt.Printf("file received:  %#v \n\n", file)
-		// c.String(
-		// 	http.StatusOK,
-		// 	fmt.Sprintf("file received:  %#v \n\n", file),
-		// )
 		pathSep := fmt.Sprintf("%c", os.PathSeparator)
 		uploadedFileName = filepath.Base(file.Filename)
 		fileNameInWorkDir := workDirName + pathSep + uploadedFileName
 		if err := c.SaveUploadedFile(file, fileNameInWorkDir); err != nil {
-			log.Default().Printf("[ERROR] saving %s", fileNameInWorkDir)
-			c.String(
-				http.StatusBadRequest,
-				fmt.Sprintf("upload file err: %s", err.Error()+"\n"),
-			)
+			msgErr := fmt.Sprintf("[ERROR] saving uploaded file %s in workdir. detail: %s", fileNameInWorkDir, err.Error())
+			log.Default().Printf(msgErr)
+			c.JSON(http.StatusInternalServerError, gin.H{"code": http.StatusInternalServerError, "message": msgErr})
+			// c.String(
+			// 	http.StatusBadRequest,
+			// 	fmt.Sprintf("upload file err: %s", err.Error()+"\n"),
+			// )
 			return
 		}
 	}
-
-	log.Default().Printf("file %v was uploaded and saved properly in the server", uploadedFileName)
+	log.Default().Printf("[INFO] file %v was uploaded and saved properly in the server in the workdir", uploadedFileName)
 
 	// process the html to pdf convertion
 	var pdfFilePath string
 	if strings.HasSuffix(strings.ToLower(uploadedFileName), ".zip") {
 		pdfFilePath, err = services.Zip2Pdf(workDirName, uploadedFileName)
 		if err != nil {
-			c.String(http.StatusInternalServerError, fmt.Sprintf("server error: %s \n", err.Error()))
+			msgErr := fmt.Sprintf("[ERROR] executing zip to pdf service. err detail: %s ", err.Error())
+			c.JSON(http.StatusInternalServerError, gin.H{"code": http.StatusInternalServerError, "message": msgErr})
+			//c.String(http.StatusInternalServerError, fmt.Sprintf("server error: %s \n", err.Error()))
 			return
 		}
 	} else {
-		pdfFilePath, err = services.HtmlText2Pdf(workDirName, uploadedFileName)
-		if err != nil {
-			c.String(http.StatusInternalServerError, fmt.Sprintf("server err: %s", err.Error()+"\n"))
-			return
-		}
+		errMsg := "[ERROR] file uploaded must be .zip"
+		c.JSON(http.StatusBadRequest, gin.H{"code": http.StatusInternalServerError, "message": errMsg})
+		return
+		// c.String(http.StatusInternalServerError, fmt.Sprintf("server err: %s", err.Error()+"\n"))
+		// return
 	}
+	log.Default().Println("[INFO]", "zip to pdf service was executed")
 
 	// reponse: pdf file
 	c.File(string(pdfFilePath))
-	log.Default().Printf("html to pdf successful. pdf file generated: %s", pdfFilePath)
+	log.Default().Printf("[INFO] html to pdf executed successfully. pdf file generated: %s", pdfFilePath)
 
 	// Removes workdir
 	err = removeWorkDir(workDirName)
 	if err != nil {
-		log.Default().Printf("err on deliting used workdir %s", workDirName)
+		log.Default().Printf("[Error] deliting used workdir %s. detail: %s", workDirName, err.Error())
 	}
-	log.Default().Printf("executed clean up of workdir: %s", workDirName)
+	log.Default().Printf("[INFO] executed clean up of workdir: %s", workDirName)
 
 }
 
@@ -121,14 +130,6 @@ func createWorkDir() (string, error) {
 
 	return uuid, nil
 
-	// // cmd := fmt.Sprintf("mkdir %s", uuid)
-	// // out, err := exec.Command(cmd).Output()
-	// // if err != nil {
-	// // 	return "", err
-	// // }
-	// cmdOut := string(out)
-	// _ = cmdOut
-	// return uuid, nil
 }
 
 func removeWorkDir(name string) error {
@@ -150,7 +151,7 @@ func validatePayload(files []*multipart.FileHeader) error {
 		return errors.New("more than 1 file was uploaded")
 	}
 
-	allowedSuffixes := []string{".zip", ".html"}
+	allowedSuffixes := []string{".zip"}
 	for _, file := range files {
 		for _, suffix := range allowedSuffixes {
 			if strings.HasSuffix(strings.ToLower(file.Filename), suffix) {
@@ -158,5 +159,5 @@ func validatePayload(files []*multipart.FileHeader) error {
 			}
 		}
 	}
-	return errors.New("invalid suffix of uploaded file name. Allows [.zip, .html]")
+	return errors.New("invalid suffix of uploaded file name. Allows only [.zip]")
 }

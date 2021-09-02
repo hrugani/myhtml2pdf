@@ -1,6 +1,8 @@
 package app
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -8,7 +10,8 @@ var (
 	router = gin.Default()
 )
 
-func StartApplication() {
+func StartApplication(port int) {
+	listeningString := fmt.Sprintf(":%d", port)
 	mapUrls()
-	router.Run(":8080")
+	router.Run(listeningString)
 }

@@ -11,26 +11,31 @@ import (
 	"strings"
 )
 
+// Zip2Pdf executes the main peocess that converts a html file to a pdf file
 func Zip2Pdf(workdirName, filename string) (string, error) {
 
-	log.Default().Printf("service Zip2Pdf was called. WorkDir= %s, File= %s", workdirName, filename)
+	log.Default().Printf("[INFO] service Zip2Pdf was called. WorkDir= %s, File= %s", workdirName, filename)
 
 	if err := changeCurrentDir(workdirName); err != nil {
 		return "", err
 	}
 	defer changeCurrentDir("..")
+	log.Default().Println("[INFO] current dir was changed to workdir")
 
 	unzippedFilenames, err := Unzip(filename, ".")
 	if err != nil {
 		return "", err
 	}
+	log.Default().Println("[INFO] Uploaded file was unzipped successfully")
 
 	htmlFileName, err := getHtmlFileNameFromUnzipedFileNames(unzippedFilenames)
 	if err != nil {
 		return "", err
 	}
+	log.Default().Printf("[INFO] html file name was identified: %s", htmlFileName)
 
 	imagesFileNames := getImageFileNamesFromUnzipdFileNames(unzippedFilenames)
+	log.Default().Printf("[INFO] all image file names was identified, %v ", imagesFileNames)
 
 	// only if html contains images embed them.
 	if len(imagesFileNames) > 0 {
@@ -44,8 +49,8 @@ func Zip2Pdf(workdirName, filename string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-
-	log.Default().Println("service Zip2Pdf executed successfully")
+	log.Default().Println("[INFO] wkhtmltopdf command line util executed successful")
+	log.Default().Println("[INFO] service Zip2Pdf finished successfully")
 	return pdfFileFullName, nil
 }
 
@@ -139,63 +144,3 @@ func getImageFileNamesFromUnzipdFileNames(fNames []string) []string {
 	}
 	return resp
 }
-
-// func getHtmlFileName() (string, error) {
-
-// 	file, err := os.Open(".")
-// 	if err != nil {
-// 		return "", err
-// 	}
-// 	defer file.Close()
-
-// 	fileList, _ := file.Readdirnames(0) // 0 to read all files and folders
-// 	for _, name := range fileList {
-// 		if strings.HasSuffix(name, ".html") {
-// 			return name, nil
-// 		}
-// 	}
-
-// 	return "", errors.New("no html file present in uploaded data")
-
-// }
-
-// func getImageFileNames() ([]string, error) {
-// 	file, err := os.Open(".")
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	defer file.Close()
-
-// 	fileList, _ := file.Readdirnames(0) // 0 to read all files and folders
-// 	resp := []string{}
-// 	for _, name := range fileList {
-// 		if strings.HasSuffix(name, ".png") || strings.HasSuffix(name, ".jpg") {
-// 			resp = append(resp, name)
-// 		}
-// 	}
-
-// 	return resp, nil
-// }
-
-// func embedImgsInHtml(unzipedFileNames []string) (string, error) {
-
-// 	file, err := os.Open(".")
-// 	if err != nil {
-// 		return "", err
-// 	}
-// 	defer file.Close()
-
-// 	htmlFileName, err := getHtmlFileNameFromUnzipedFileNames(unzipedFileNames)
-// 	if err != nil {
-// 		return "", err
-// 	}
-
-// 	imageFileNames := getImageFileNamesFromUnzipdFileNames(unzipedFileNames)
-
-// 	newHtmlFileName, err := imagesEmbeder(htmlFileName, imageFileNames)
-// 	if err != nil {
-// 		return "", err
-// 	}
-
-// 	return newHtmlFileName, nil
-// }
