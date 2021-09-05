@@ -7,4 +7,5 @@ import (
 func mapUrls() {
 	router.GET("/ping", controller.Ping)
 	router.POST("/convert", controller.Convert)
+	router.POST("/concat", controller.Concat)
 }
