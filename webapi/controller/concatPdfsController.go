@@ -59,7 +59,7 @@ func Concat(c *gin.Context) {
 
 	// process the html to pdf convertion
 	var pdfFilePath string
-	pdfFilePath, err = services.Zip2Pdf(workDirName, uploadedFileName)
+	pdfFilePath, err = services.ConcatPdfs(workDirName, uploadedFileName)
 	if err != nil {
 		msgErr := fmt.Sprintf("[ERROR] executing concatpdfs service, detail: %s ", err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"code": http.StatusInternalServerError, "message": msgErr})
