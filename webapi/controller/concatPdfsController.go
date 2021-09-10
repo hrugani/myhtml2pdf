@@ -17,6 +17,7 @@ func Concat(c *gin.Context) {
 	form, err := c.MultipartForm()
 	if err != nil {
 		msgErr := fmt.Sprintf("[ERROR] receiving request. detail: %s ", err.Error())
+		log.Default().Print(msgErr)
 		c.JSON(http.StatusBadRequest, gin.H{"code": http.StatusBadRequest, "message": msgErr})
 		return
 	}
@@ -62,10 +63,11 @@ func Concat(c *gin.Context) {
 	pdfFilePath, err = services.ConcatPdfs(workDirName, uploadedFileName)
 	if err != nil {
 		msgErr := fmt.Sprintf("[ERROR] executing concatpdfs service, detail: %s ", err.Error())
+		log.Default().Println(msgErr)
 		c.JSON(http.StatusInternalServerError, gin.H{"code": http.StatusInternalServerError, "message": msgErr})
 		return
 	}
-	log.Default().Println("[INFO]", "concatPdfs service was executed")
+	log.Default().Print("[INFO]", "concatPdfs service was executed")
 
 	// reponse: pdf file
 	c.File(string(pdfFilePath))

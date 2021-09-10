@@ -22,6 +22,7 @@ func Convert(c *gin.Context) {
 	form, err := c.MultipartForm()
 	if err != nil {
 		msgErr := fmt.Sprintf("[ERROR] receiving request. detail: %s ", err.Error())
+		log.Default().Print(msgErr)
 		c.JSON(http.StatusBadRequest, gin.H{"code": http.StatusBadRequest, "message": msgErr})
 		return
 	}
@@ -31,7 +32,7 @@ func Convert(c *gin.Context) {
 	err = validatePayload(files)
 	if err != nil {
 		msgErr := "[ERROR] validating request payload. detail: " + err.Error()
-		log.Default().Println(msgErr)
+		log.Default().Print(msgErr)
 		c.JSON(http.StatusBadRequest, gin.H{"code": http.StatusBadRequest, "message": msgErr})
 		return
 	}
@@ -41,7 +42,7 @@ func Convert(c *gin.Context) {
 	workDirName, err := createWorkDir()
 	if err != nil {
 		msgErr := "[ERROR] creating workdir. detail: " + err.Error()
-		log.Default().Println(msgErr)
+		log.Default().Print(msgErr)
 		c.JSON(http.StatusInternalServerError, gin.H{"code": http.StatusInternalServerError, "message": msgErr})
 		return
 	}
@@ -55,7 +56,7 @@ func Convert(c *gin.Context) {
 		fileNameInWorkDir := workDirName + pathSep + uploadedFileName
 		if err := c.SaveUploadedFile(file, fileNameInWorkDir); err != nil {
 			msgErr := fmt.Sprintf("[ERROR] saving uploaded file %s in workdir. detail: %s", fileNameInWorkDir, err.Error())
-			log.Default().Printf(msgErr)
+			log.Default().Print(msgErr)
 			c.JSON(http.StatusInternalServerError, gin.H{"code": http.StatusInternalServerError, "message": msgErr})
 			return
 		}
@@ -68,11 +69,13 @@ func Convert(c *gin.Context) {
 		pdfFilePath, err = services.Zip2Pdf(workDirName, uploadedFileName)
 		if err != nil {
 			msgErr := fmt.Sprintf("[ERROR] executing zip2pdf service, detail: %s ", err.Error())
+			log.Default().Print(msgErr)
 			c.JSON(http.StatusInternalServerError, gin.H{"code": http.StatusInternalServerError, "message": msgErr})
 			return
 		}
 	} else {
 		errMsg := "[ERROR] file uploaded must be .zip"
+		log.Default().Print(errMsg)
 		c.JSON(http.StatusBadRequest, gin.H{"code": http.StatusInternalServerError, "message": errMsg})
 		return
 	}
@@ -100,14 +103,14 @@ func createWorkDir() (string, error) {
 		return "", err
 	}
 
-	log.Default().Println("workdir was created")
+	log.Default().Println("[INFO] workdir was created")
 
 	err = os.Chmod(uuid, 0777)
 	if err != nil {
 		return "", err
 	}
 
-	log.Default().Println("chmod was applyed on workdir")
+	log.Default().Println("[INFO] chmod was applyed on workdir")
 
 	return uuid, nil
 
