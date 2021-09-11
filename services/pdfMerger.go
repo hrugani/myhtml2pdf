@@ -12,7 +12,7 @@ import (
 // PdfMerger Merges all pdf files pointed by pdfFileNames sorting its names to define the sequence of appending process.
 func MergePdfs(workDirName string, pdfFileNames []string) (string, error) {
 	sortedPdfFileNames := sortPdfFileNames(pdfFileNames)
-	outputFileName := "output.pdf"
+	outputFileName := "merged.pdf"
 	// err := api.MergeAppendFile(sortedPdfFileNames, outputFileName, nil)
 	err := mergePdfUsingPdfTk(sortedPdfFileNames, outputFileName)
 	if err != nil {
@@ -57,7 +57,7 @@ func mergePdfUsingPdfTk(fNames []string, outputFileName string) error {
 	}
 	lastParam := fmt.Sprintf("cat output %s", outputFileName)
 
-	log.Default().Printf("[INFO] exec command line: %s %s %s", cmdName, pdfFileNames, lastParam)
+	log.Default().Printf("[INFO] executing command line: %s %s %s", cmdName, pdfFileNames, lastParam)
 
 	cmd := exec.Command(cmdName, pdfFileNames, lastParam)
 	cmd.Stdout = outFile
@@ -68,7 +68,8 @@ func mergePdfUsingPdfTk(fNames []string, outputFileName string) error {
 	}
 	err = cmd.Wait()
 	if err != nil {
-		msgerr := "[ERROR] probably some image isn't present into uloaded files"
+		msgerr := fmt.Sprintf("[ERROR] executing command line. detail: %s", err)
+		log.Default().Print(msgerr)
 		return errors.New(msgerr)
 	}
 
