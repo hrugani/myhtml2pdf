@@ -11,6 +11,10 @@ import (
 	"github.com/hrugani/myhtml2pdf/services"
 )
 
+const (
+	workdirPreffixParamName = "preffix"
+)
+
 func Concat(c *gin.Context) {
 
 	// Multipart form
@@ -33,8 +37,10 @@ func Concat(c *gin.Context) {
 	}
 	log.Default().Println("[INFO]", "request payload was validated")
 
+	preffix := c.Query(workdirPreffixParamName)
+
 	// creates workdir
-	workDirName, err := createWorkDir()
+	workDirName, err := createWorkDir("mergepdf", preffix)
 	if err != nil {
 		msgErr := "[ERROR] creating workdir. detail: " + err.Error()
 		log.Default().Println(msgErr)

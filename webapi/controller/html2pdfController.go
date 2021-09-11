@@ -38,8 +38,10 @@ func Convert(c *gin.Context) {
 	}
 	log.Default().Println("[INFO]", "request payload was validated")
 
+	preffix := c.Query(workdirPreffixParamName)
+
 	// creates workdir
-	workDirName, err := createWorkDir()
+	workDirName, err := createWorkDir("html2pdf", preffix)
 	if err != nil {
 		msgErr := "[ERROR] creating workdir. detail: " + err.Error()
 		log.Default().Print(msgErr)
@@ -94,25 +96,31 @@ func Convert(c *gin.Context) {
 
 }
 
-func createWorkDir() (string, error) {
+func createWorkDir(baseName, preffix string) (string, error) {
 
 	uuid := uuid.NewV4().String()
+	var dirName = ""
+	if preffix == "" {
+		dirName = fmt.Sprintf("%s_%s", baseName, uuid)
+	} else {
+		dirName = fmt.Sprintf("%s_%s_%s", baseName, preffix, uuid)
+	}
 
-	err := os.Mkdir(uuid, 0777)
+	err := os.Mkdir(dirName, 0777)
 	if err != nil {
 		return "", err
 	}
 
 	log.Default().Println("[INFO] workdir was created")
 
-	err = os.Chmod(uuid, 0777)
+	err = os.Chmod(dirName, 0777)
 	if err != nil {
 		return "", err
 	}
 
 	log.Default().Println("[INFO] chmod was applyed on workdir")
 
-	return uuid, nil
+	return dirName, nil
 
 }
 
