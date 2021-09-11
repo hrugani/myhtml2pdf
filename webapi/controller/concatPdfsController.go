@@ -71,7 +71,7 @@ func Concat(c *gin.Context) {
 
 	// reponse: pdf file
 	c.File(string(pdfFilePath))
-	log.Default().Printf("[INFO] html to pdf executed successfully. pdf file generated: %s", pdfFilePath)
+	log.Default().Printf("[INFO] concat pdf executed successfully. pdf file generated: %s", pdfFilePath)
 
 	// Removes workdir
 	err = removeWorkDir(workDirName)

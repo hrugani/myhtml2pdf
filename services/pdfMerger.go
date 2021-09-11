@@ -50,16 +50,12 @@ func mergePdfUsingPdfTk(fNames []string, outputFileName string) error {
 		log.Default().Printf("[INFO] OS windows detected: comand name to be used: %s", cmdName)
 	}
 
-	// builds the list od pdf files as it must be passed to the pdfth command-line application
-	var pdfFileNames = " "
-	for _, name := range fNames {
-		pdfFileNames += name + " "
-	}
-	lastParam := fmt.Sprintf("cat output %s", outputFileName)
-
-	log.Default().Printf("[INFO] executing command line: %s %s %s", cmdName, pdfFileNames, lastParam)
-
-	cmd := exec.Command(cmdName, pdfFileNames, lastParam)
+	var cmdLineParams []string
+	cmdLineParams = append(cmdLineParams, fNames...)
+	cmdLineParams = append(cmdLineParams, "cat")
+	cmdLineParams = append(cmdLineParams, "output")
+	cmdLineParams = append(cmdLineParams, outputFileName)
+	cmd := exec.Command(cmdName, cmdLineParams...)
 	cmd.Stdout = outFile
 	cmd.Stderr = errFile
 	err = cmd.Start()
