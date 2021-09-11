@@ -8,6 +8,18 @@ Offers 2 endponts:
 
 Both endepoints receive a zipped file that should contains all the necessary inputs
 to execute the desired pdf process.  
+  
+This web app is only a wrapper for 2 command lines applications that execute the wanted action.
+For HTRML to PDF convertion the wkhtmltopdf command line application is used.
+For PDF merging, the Application pdftk is used.
+
+Both command line appllications offer a lot of options that allow more complex tranformations.
+The mean goal of this project is a minimalist implementation  
+to reach the necessities of a specific company.
+So, here we spend efforts to make the things simple for some target use cases.
+But, this base code can be used and adapted for other use cases or even
+adapted to reach more generic goals. 
+
 
 1. /convert  
    converts HTML file to PDF.  
