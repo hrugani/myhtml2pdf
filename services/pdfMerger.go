@@ -64,12 +64,12 @@ func mergePdfUsingPdfTk(fNames []string, outputFileName string) error {
 	}
 	err = cmd.Wait()
 	if err != nil {
-		msgerr := fmt.Sprintf("[ERROR] executing command line. detail: %s", err)
+		msgerr := fmt.Sprintf("[ERROR] executing pdftk command line. detail: %s", err)
 		log.Default().Print(msgerr)
 		return errors.New(msgerr)
 	}
 
-	log.Default().Print("[INFO] command line executed")
+	log.Default().Print("[INFO] pdftk command-line executed")
 
 	return nil
 

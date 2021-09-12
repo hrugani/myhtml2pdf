@@ -51,4 +51,10 @@ adapted to reach more generic goals.
    The order of concatenation obeys the alphabetical order of the PDF file names inside the zipped file.
 
    Returns 1 PDF file named "output.pdf" where into it all pdf files uploaded in the zipped file
-   concatenated in alphabetical order of its respective pdf file names.
+   concatenated in alphabetical order of its respective pdf file names.  
+
+   ## Deploying in Windows server
+
+   ## Deploying in linux server
+
+   ## Deploying using docker containers

@@ -41,7 +41,7 @@ func ConcatPdfs(workDirName, fName string) (string, error) {
 		log.Default().Print(errMsg)
 		return "", err
 	}
-	log.Default().Println("[INFO] pdfCpu command line util executed successful")
+	log.Default().Println("[INFO] pdftk command-line executed successfully")
 	log.Default().Println("[INFO] service ConcatPdfs finished successfully")
 	return pdfFileFullName, nil
 }
