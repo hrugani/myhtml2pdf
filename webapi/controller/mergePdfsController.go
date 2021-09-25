@@ -15,7 +15,7 @@ const (
 	workdirPreffixParamName = "preffix"
 )
 
-func Concat(c *gin.Context) {
+func MergePDFs(c *gin.Context) {
 
 	// Multipart form
 	form, err := c.MultipartForm()
@@ -66,9 +66,9 @@ func Concat(c *gin.Context) {
 
 	// process the html to pdf convertion
 	var pdfFilePath string
-	pdfFilePath, err = services.ConcatPdfs(workDirName, uploadedFileName)
+	pdfFilePath, err = services.MergePdfFiles(workDirName, uploadedFileName)
 	if err != nil {
-		msgErr := fmt.Sprintf("[ERROR] executing concatpdfs service, detail: %s ", err.Error())
+		msgErr := fmt.Sprintf("[ERROR] executing mergePdfFiles service, detail: %s ", err.Error())
 		log.Default().Println(msgErr)
 		c.JSON(http.StatusInternalServerError, gin.H{"code": http.StatusInternalServerError, "message": msgErr})
 		return

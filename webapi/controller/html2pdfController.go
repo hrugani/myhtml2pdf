@@ -16,7 +16,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
-func Convert(c *gin.Context) {
+func ConvertHtml2PDF(c *gin.Context) {
 
 	// Multipart form
 	form, err := c.MultipartForm()

@@ -3,14 +3,14 @@
 implements a REST api que process PDF files.  
   
 Offers 2 endponts:  
-/convert  
-/concat  
+/html2pdf  
+/merge  
 
 Both endepoints receive a zipped file that should contains all the necessary inputs
 to execute the desired pdf process.  
   
-This web app is only a wrapper for 2 command lines applications that execute the wanted action.
-For HTRML to PDF convertion the wkhtmltopdf command line application is used.
+This web app is only a wrapper for 2 execelent command lines applications that execute PDF actions.
+For HTML to PDF convertion the wkhtmltopdf command line application is used.
 For PDF merging, the Application pdftk is used.
 
 Both command line appllications offer a lot of options that allow more complex tranformations.
@@ -21,7 +21,9 @@ But, this base code can be used and adapted for other use cases or even
 adapted to reach more generic goals. 
 
 
-1. /convert  
+### How to use the 2 Endpoints:   
+
+- /convert  
    converts HTML file to PDF.  
    this endpoint receives a standard Multipart HTTP request which one should contains  
    
@@ -51,10 +53,87 @@ adapted to reach more generic goals.
    The order of concatenation obeys the alphabetical order of the PDF file names inside the zipped file.
 
    Returns 1 PDF file named "output.pdf" where into it all pdf files uploaded in the zipped file
-   concatenated in alphabetical order of its respective pdf file names.  
+   concatenated in alphabetical order of its respective pdf file names. 
+
+
+### CURL examples for testing
+
+
+Merging PDFs files:
+This curl command must be executed cmd/web/api directory as the current dir
+curl -X POST http://localhost:8080/merge?preffix=evol1234 \
+  -F files=@examples/pdf-example-1.zip \
+  -H "Content-Type: multipart/form-data" \
+  -o merged.pdf
+
+Converting HTML to PDF:
+This curl command also must be executed cmd/web/api directory as the current dir
+curl -X POST http://localhost:8080/html2pdf?preffix=evol1234 \
+  -F files=@examples/example-4.zip \
+  -H "Content-Type: multipart/form-data" \
+  -o converted.pdf
+
+
+Obs: you can create your own .zip files for testing
+Always You must take in account:
+1. the .zip file content for html2pdf must contain:  
+   Only 1 file .html whitch one should contains the HTML content to be converted to PDF.  
+   All the images files that are pointed by each IMG src attribute present into the html Body.  
+   Only images of type .png, .jpeg, .jpg will be accepted.  
+   All IMG src must point to an actual image file present into .zip file.  
+   When you want to show nothing in a determined HTML-IMG-tag,  
+   it is necessary you put into the .zip file a tranparent image without any graphical information  
+   and values the IMG src attribute with the name of that transparent image.  
+   When a IMG src atribute points to a not existent image in the .zip file an error  
+   will be launched and the wanted convertion will not be done.  
+   The gold rule is to put into the .zip all elements that is necessary to
+   provide a consistent HTML-to-PDF convertion.  
+   The presence of unecessary images are allowed, but it isn't a good practice.  
+   Please, avoid to use special chars in the .html and images file names.
+   Avoid spaces in file names too.
+   Prefer pure ASCII characteres    
+
+2. the .zip file for pdf merging must contain:
+   All .pdf files which ones should be merged.
+   They will be merged in alphabetical order.
+   Please, avoid to use special chars in the names of .pdf files
+   Avoid spaces in the .pdf file names too.
+   Prefer pure ASCII characteres    
+
 
    ## Deploying in Windows server
 
+   On windows machines, the better approach is to have all binary files
+   and its respective DLLs present into the same directory.  
+   *Simply puts all of them into the same directory and you will be ready to go.
+   There are 3 programs:
+   1) mypdfservices:
+      This is the binary genereted by this project in golang.
+      this binary doesn't have any DLLs and it can be generated using the 
+      following command line when we are positionaed in the cmd/webapi
+      of the project:
+      *GOOS=windows go build -o mypdfservices.exe main.go*  
+
+
+   2) pdftk (and its DLL: libiconv2.dll)  
+      this binaries files can be found in the cmd/webapi folder  
+      of this project.  
+
+   3) wkhtmltopdf.exe (and its DDL: wkhtmltox.dll)  
+      this binaries files also can be found in the cmd/webapi folder  
+      of this project.  
+
+   To make the service active simply execute the mypdfservices binary
+   By Default program will listening at IP port 8080 for HTTP requests.
+   Case you need to use another IP port, you can pass the desired port number as the fist parameter  
+  
    ## Deploying in linux server
+
+   the pdftk must be installed in the linux systems, using the package manager
+   For Debien and Ubuntu linux flavors you can run the followinf commands:  
+   *sudo apt-get uddate*  
+   *sudo apt-get install pdftk*    
+  
+   For html2pdf it is better get the binary file that can be found in cmd/webapi folder 
 
    ## Deploying using docker containers

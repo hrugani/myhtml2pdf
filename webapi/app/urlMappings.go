@@ -6,6 +6,6 @@ import (
 
 func mapUrls() {
 	router.GET("/ping", controller.Ping)
-	router.POST("/convert", controller.Convert)
-	router.POST("/concat", controller.Concat)
+	router.POST("/html2pdf", controller.ConvertHtml2PDF)
+	router.POST("/merge", controller.MergePDFs)
 }

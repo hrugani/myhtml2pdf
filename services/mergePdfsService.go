@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func ConcatPdfs(workDirName, fName string) (string, error) {
+func MergePdfFiles(workDirName, fName string) (string, error) {
 
 	log.Default().Printf("[INFO] service ConcatPdfs was called. WorkDir= %s, File= %s", workDirName, fName)
 
