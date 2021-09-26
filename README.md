@@ -34,7 +34,7 @@ adapted to reach more generic goals.
    1 file with the extension .html (HTML content to be converted).  
    
    N files of type images with all respective images referenced in the src attributes of IMG HTML tags.
-   Here, it is important to assert all images pointed by each IMG tag are present into zipped files.
+   Here, it is important to assert all images pointed by each IMG tag are present into zip file.
    All IMG tags must point to an image that exists into the zipped file and in the src attribute must
    be valued with the exact name of the image file in the zipped file.
    Even when a IMG tag doensn't have to show no-content, an transparent image must be present into
@@ -110,23 +110,23 @@ Always You must take in account:
      
 
    There are 3 programs:
-   1) mypdfservices:
+   1) **mypdfservices.exe**:
       This is the binary genereted by this project in golang.
       it can be generated executing /scripts/update-win-dist.sh
-       The main command line into this script is:
-      *GOOS=windows go build -o mypdfservices.exe main.go*
-      This is the only binary file that shoud be executed to make all services up and running.
+       The main command line into this script is:  
+      **GOOS=windows go build -o mypdfservices.exe main.go**  
+      This is the only binary file that should be executed to make all services up and running.
       This executable file receives an optional parameter used to change the default IP Port.
       When this program is executed without any parameter, by default, the server will respond on 8080 port.  
 
 
-   2) pdftk (and its DLL: libiconv2.dll)  
+   2) **pdftk.exe** (and its DLL: libiconv2.dll)  
       this binaries files can be found in the cmd/webapi folder  
       of this project.
       This program is executed inside mypdfservices.
       Only the presence of it into de instalation directory is necessary  
 
-   3) wkhtmltopdf.exe (and its DDL: wkhtmltox.dll)  
+   3) **wkhtmltopdf.exe** (and its DDL: wkhtmltox.dll)  
       this binaries files also can be found in the cmd/webapi folder  
       of this project.  
       This program is called inside mypdfservices.
@@ -136,14 +136,23 @@ Always You must take in account:
    By default, this program will be listening at IP port 8080 (HTTP Post requests)
    Whether you want to use another IP port, you can pass the desired port number as the first parameter  
    ex: mypdfservices 9134
-   This command line will change the default port 8080 to 9134 
+   This command line will change the default port 8080 to 9134  
+
+   To make tests easy 2 files .html are provided.
+   The files are **Test_HTML2PDF.html** and **Test_MergePDFs.html**
+   Both contain a minimalistic HTML-FORM.
+   When they are opened by any browser running on the same machine where our mypdfservices are running
+   the browser executes a correct HTTP POST request in port 8080 (default port).
+   Whether the default port 8080 was changed using a parameter of mypdfserves program
+   these html files must be modified accordingly.
+
 
    ## Deploying in linux server
 
    the pdftk must be installed in the linux systems, using the package manager
    For Debien and Ubuntu linux flavors you can run the followinf commands:  
-   *sudo apt-get uddate*  
-   *sudo apt-get -y install pdftk*    
+   **sudo apt-get update**  
+   **sudo apt-get -y install pdftk**    
   
    For html2pdf it is better get the binary file that can be found in cmd/webapi folder 
 
