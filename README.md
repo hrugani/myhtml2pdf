@@ -6,7 +6,7 @@ Offers 2 endpoints:
 /html2pdf  
 /merge  
 
-Both endepoints receive a zipped file that should contains all the necessary inputs
+Both endpoints receive a zipped file that should contains all the necessary inputs
 to execute the desired pdf process.  
   
 This web app is only a wrapper for 2 execelent command lines applications that execute PDF actions.
@@ -14,7 +14,7 @@ For HTML to PDF convertion the wkhtmltopdf command line application is used.
 For PDF merging, the Application pdftk is used.
 We are very grateful to all developers that contributed to these 2 projects. Good job!!!!
 
-Both command line appllications offer a lot of options that allow more complex tranformations.
+Both command line applications offer a lot of options that allow more complex tranformations.
 The mean goal of this project is a minimalist implementation  
 to reach the necessities of a specific company.
 So, here we spend efforts to make the things simple for some target use cases.
