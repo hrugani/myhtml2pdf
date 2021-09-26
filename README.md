@@ -1,8 +1,8 @@
 # myhtml2pdf
 
-implements a REST api que process PDF files.  
+implements a REST api that process PDF files.  
   
-Offers 2 endponts:  
+Offers 2 endpoints:  
 /html2pdf  
 /merge  
 
@@ -12,6 +12,7 @@ to execute the desired pdf process.
 This web app is only a wrapper for 2 execelent command lines applications that execute PDF actions.
 For HTML to PDF convertion the wkhtmltopdf command line application is used.
 For PDF merging, the Application pdftk is used.
+We are very grateful to all developers that contributed to these 2 projects. Good job!!!!
 
 Both command line appllications offer a lot of options that allow more complex tranformations.
 The mean goal of this project is a minimalist implementation  
@@ -23,7 +24,7 @@ adapted to reach more generic goals.
 
 ### How to use the 2 Endpoints:   
 
-- /convert  
+1. /convert  
    converts HTML file to PDF.  
    this endpoint receives a standard Multipart HTTP request which one should contains  
    
@@ -46,7 +47,7 @@ adapted to reach more generic goals.
 
    Returns 1 PDF file that contains the HTML content converted to PDF format.
 
-2. /concat  
+2. /merge  
    concatenates N PDFs files into 1 pdf file.
    Also receives a Multpart HTTP request with only one zipped file attached:
    This zipped files must contains all the pdf files that should be concatenated.
@@ -105,34 +106,44 @@ Always You must take in account:
 
    On windows machines, the better approach is to have all binary files
    and its respective DLLs present into the same directory.  
-   *Simply puts all of them into the same directory and you will be ready to go.
+   *Simply puts all of them into the same directory and you will be ready to go.  
+     
+
    There are 3 programs:
    1) mypdfservices:
       This is the binary genereted by this project in golang.
-      this binary doesn't have any DLLs and it can be generated using the 
-      following command line when we are positionaed in the cmd/webapi
-      of the project:
-      *GOOS=windows go build -o mypdfservices.exe main.go*  
+      it can be generated executing /scripts/update-win-dist.sh
+       The main command line into this script is:
+      *GOOS=windows go build -o mypdfservices.exe main.go*
+      This is the only binary file that shoud be executed to make all services up and running.
+      This executable file receives an optional parameter used to change the default IP Port.
+      When this program is executed without any parameter, by default, the server will respond on 8080 port.  
 
 
    2) pdftk (and its DLL: libiconv2.dll)  
       this binaries files can be found in the cmd/webapi folder  
-      of this project.  
+      of this project.
+      This program is executed inside mypdfservices.
+      Only the presence of it into de instalation directory is necessary  
 
    3) wkhtmltopdf.exe (and its DDL: wkhtmltox.dll)  
       this binaries files also can be found in the cmd/webapi folder  
       of this project.  
+      This program is called inside mypdfservices.
+      Only the presence of it into de instalation directory is necessary  
 
-   To make the service active simply execute the mypdfservices binary
-   By Default program will listening at IP port 8080 for HTTP requests.
-   Case you need to use another IP port, you can pass the desired port number as the fist parameter  
-  
+   To make the service active, simply execute the mypdfservices file.
+   By default, this program will be listening at IP port 8080 (HTTP Post requests)
+   Whether you want to use another IP port, you can pass the desired port number as the first parameter  
+   ex: mypdfservices 9134
+   This command line will change the default port 8080 to 9134 
+
    ## Deploying in linux server
 
    the pdftk must be installed in the linux systems, using the package manager
    For Debien and Ubuntu linux flavors you can run the followinf commands:  
    *sudo apt-get uddate*  
-   *sudo apt-get install pdftk*    
+   *sudo apt-get -y install pdftk*    
   
    For html2pdf it is better get the binary file that can be found in cmd/webapi folder 
 
