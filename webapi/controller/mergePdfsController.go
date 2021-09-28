@@ -35,7 +35,7 @@ func MergePDFs(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"code": http.StatusBadRequest, "message": msgErr})
 		return
 	}
-	log.Default().Println("[INFO]", "request payload was validated")
+	log.Default().Println("[INFO]", "payload was validated")
 
 	preffix := c.Query(workdirPreffixParamName)
 
@@ -64,14 +64,23 @@ func MergePDFs(c *gin.Context) {
 	}
 	log.Default().Printf("[INFO] file %v was uploaded and saved properly in the server in the workdir", uploadedFileName)
 
-	// process the html to pdf convertion
+	// process merging
 	var pdfFilePath string
 	pdfFilePath, err = services.MergePdfFiles(workDirName, uploadedFileName)
 	if err != nil {
+
+		// Removes workdir
+		err = removeWorkDir(workDirName)
+		if err != nil {
+			log.Default().Printf("[ERROR] deliting used workdir %s. detail: %s", workDirName, err.Error())
+		}
+		log.Default().Printf("[INFO] executed clean up of workdir: %s", workDirName)
+
 		msgErr := fmt.Sprintf("[ERROR] executing mergePdfFiles service, detail: %s ", err.Error())
 		log.Default().Println(msgErr)
 		c.JSON(http.StatusInternalServerError, gin.H{"code": http.StatusInternalServerError, "message": msgErr})
 		return
+
 	}
 	log.Default().Print("[INFO]", "concatPdfs service was executed")
 

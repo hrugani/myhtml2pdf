@@ -68,31 +68,50 @@ func ConvertHtml2PDF(c *gin.Context) {
 	// process the html to pdf convertion
 	var pdfFilePath string
 	if strings.HasSuffix(strings.ToLower(uploadedFileName), ".zip") {
+
 		pdfFilePath, err = services.Zip2Pdf(workDirName, uploadedFileName)
 		if err != nil {
+
+			// Removes workdir
+			err = removeWorkDir(workDirName)
+			if err != nil {
+				log.Default().Printf("[ERROR] deliting used workdir %s. detail: %s", workDirName, err.Error())
+			}
+			log.Default().Printf("[INFO] executed clean up of workdir: %s", workDirName)
+
 			msgErr := fmt.Sprintf("[ERROR] executing zip2pdf service, detail: %s ", err.Error())
 			log.Default().Print(msgErr)
 			c.JSON(http.StatusInternalServerError, gin.H{"code": http.StatusInternalServerError, "message": msgErr})
 			return
 		}
+
 	} else {
+
 		errMsg := "[ERROR] file uploaded must be .zip"
 		log.Default().Print(errMsg)
-		c.JSON(http.StatusBadRequest, gin.H{"code": http.StatusInternalServerError, "message": errMsg})
+
+		// Removes workdir
+		err = removeWorkDir(workDirName)
+		if err != nil {
+			log.Default().Printf("[ERROR] deliting used workdir %s. detail: %s", workDirName, err.Error())
+		}
+		log.Default().Printf("[INFO] executed clean up of workdir: %s", workDirName)
+
+		c.JSON(http.StatusBadRequest, gin.H{"code": http.StatusBadRequest, "message": errMsg})
 		return
 	}
 	log.Default().Println("[INFO]", "zip to pdf service was executed")
 
-	// reponse: pdf file
-	c.File(string(pdfFilePath))
-	log.Default().Printf("[INFO] html to pdf executed successfully. pdf file generated: %s", pdfFilePath)
-
 	// Removes workdir
 	err = removeWorkDir(workDirName)
 	if err != nil {
-		log.Default().Printf("[Error] deliting used workdir %s. detail: %s", workDirName, err.Error())
+		log.Default().Printf("[ERROR] deliting used workdir %s. detail: %s", workDirName, err.Error())
 	}
 	log.Default().Printf("[INFO] executed clean up of workdir: %s", workDirName)
+
+	// reponse: pdf file
+	c.File(string(pdfFilePath))
+	log.Default().Printf("[INFO] html to pdf executed successfully. pdf file generated: %s", pdfFilePath)
 
 }
 
