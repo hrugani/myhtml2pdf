@@ -94,4 +94,5 @@ func MergePDFs(c *gin.Context) {
 		log.Default().Printf("[Error] deliting used workdir %s. detail: %s", workDirName, err.Error())
 	}
 	log.Default().Printf("[INFO] executed clean up of workdir: %s", workDirName)
+
 }

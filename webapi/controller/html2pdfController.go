@@ -102,6 +102,10 @@ func ConvertHtml2PDF(c *gin.Context) {
 	}
 	log.Default().Println("[INFO]", "zip to pdf service was executed")
 
+	// reponse: pdf file
+	c.File(string(pdfFilePath))
+	log.Default().Printf("[INFO] html to pdf executed successfully. pdf file generated: %s", pdfFilePath)
+
 	// Removes workdir
 	err = removeWorkDir(workDirName)
 	if err != nil {
@@ -109,9 +113,6 @@ func ConvertHtml2PDF(c *gin.Context) {
 	}
 	log.Default().Printf("[INFO] executed clean up of workdir: %s", workDirName)
 
-	// reponse: pdf file
-	c.File(string(pdfFilePath))
-	log.Default().Printf("[INFO] html to pdf executed successfully. pdf file generated: %s", pdfFilePath)
 
 }
 
