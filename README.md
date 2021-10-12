@@ -44,7 +44,33 @@ represents the date/time when the new log file was created.
 The system also allows up to 20 old log files (the zipped ones).
 Finally, old log files the have more than 90 days age also will be deleted.
 
+### Additional Summary Logging File
 
+We can get an additional summary login file that capture all info that
+the system sends to the consule. A Summary of all http request the 
+receives. This infomation we have in more detaled way in the main
+log file **mypdfservices_debug.log**.
+The name of this second log file the user that starts the service 
+can decide in the command line used to start the service using
+redirecting from the commandline shell. (>).
+
+Ex: command line exemple for windows
+mypdfservices.exe > mysummary.log
+
+In this example, the name of the sumamary logging file will be mysummary.log and it will be located in the sam folder the command line have been executed.
+
+Obs:
+Using the command line also is possible to change the TCP port
+where the application will lestinig for http requests.
+
+Example: 
+mypdfservice 9999 > my_summary.log
+
+In this example the TCP port will be 9999 and the summary logging file name will be my_summary.log.
+
+This summary loggin file doesn't have any logging police assigned to it.
+Only the main logging file described preveouly has polices for mitigate 
+high disk space consumming.
 
 
 ### How to use the 2 Endpoints:   
