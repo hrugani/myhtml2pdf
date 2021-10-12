@@ -12,6 +12,6 @@ const defaultPort = 8080
 func main() {
 	port := flag.Int("port", defaultPort, "IP port where this server will listen")
 	flag.Parse()
-	fmt.Println("port reqad from input parameter = ", *port)
+	fmt.Println("port read from input parameter = ", *port)
 	app.StartApplication(*port)
 }

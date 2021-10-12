@@ -21,6 +21,31 @@ So, here we spend efforts to make the things simple for some target use cases.
 But, this base code can be used and adapted for other use cases or even
 adapted to reach more generic goals. 
 
+### Logging police:
+
+The system automatically will save in the mypdfservice_debug.log file detailed information abount all requestes in json format. 
+Then we can read programmatically the log file and parse it
+usdin any program language that has a paerser for json ( corrently
+all languages have good josn libraries for that).
+
+The file **mypdfservice_debug.log** is created automacally in the same folder where the executable **mypdfservice** binary file (in windows **mypdfservices.exe**) is located.
+
+To avoid high disk consuming space, the system limits the log file to 10 MegaBytes.
+Always when the log file reaches the size of 10 MBytes, 
+the current log file is renamed and zipped.
+In addition, a new log file named **mypdfservices_debug.log** is created
+immediatly where the new logging records will be continually saved. 
+
+The name of Gzipped old log files has its name like that:  
+**mypdfservice_debug-2021-10-12T22-39-39.489.log.gz**
+the characteres between ***mypdfservice-*** and ***.log.gz***  
+represents the date/time when the new log file was created.
+
+The system also allows up to 20 old log files (the zipped ones).
+Finally, old log files the have more than 90 days age also will be deleted.
+
+
+
 
 ### How to use the 2 Endpoints:   
 
