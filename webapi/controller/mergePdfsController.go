@@ -56,6 +56,13 @@ func MergePDFs(c *gin.Context) {
 		uploadedFileName = filepath.Base(file.Filename)
 		fileNameInWorkDir := workDirName + pathSep + uploadedFileName
 		if err := c.SaveUploadedFile(file, fileNameInWorkDir); err != nil {
+			// Removes workdir
+			err = removeWorkDir(workDirName)
+			if err != nil {
+				log.Default().Printf("[ERROR] deliting used workdir %s. detail: %s", workDirName, err.Error())
+			}
+			log.Default().Printf("[INFO] executed clean up of workdir: %s", workDirName)
+
 			msgErr := fmt.Sprintf("[ERROR] saving uploaded file %s in workdir. detail: %s", fileNameInWorkDir, err.Error())
 			log.Default().Printf(msgErr)
 			c.JSON(http.StatusInternalServerError, gin.H{"code": http.StatusInternalServerError, "message": msgErr})

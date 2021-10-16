@@ -1,4 +1,4 @@
-# myhtml2pdf
+# myhtml2pdf Project
 
 implements a REST api that process PDF files.  
   
@@ -21,7 +21,7 @@ So, here we spend efforts to make the things simple for some target use cases.
 But, this base code can be used and adapted for other use cases or even
 adapted to reach more generic goals. 
 
-### Logging police:
+## Logging police section:
 
 The system automatically will save in the mypdfservice_debug.log file detailed information abount all requestes in json format. 
 Then we can read programmatically the log file and parse it
@@ -44,7 +44,7 @@ represents the date/time when the new log file was created.
 The system also allows up to 20 old log files (the zipped ones).
 Finally, old log files the have more than 90 days age also will be deleted.
 
-### Additional Summary Logging File
+## Additional Summary Logging Section:
 
 We can get an additional summary login file that capture all info that
 the system sends to the consule. A Summary of all http request the 
@@ -73,7 +73,7 @@ Only the main logging file described preveouly has polices for mitigate
 high disk space consumming.
 
 
-### How to use the 2 Endpoints:   
+## How to use the 2 Endpoints Section:   
 
 1. /convert  
    converts HTML file to PDF.  
@@ -108,7 +108,7 @@ high disk space consumming.
    concatenated in alphabetical order of its respective pdf file names. 
 
 
-### CURL examples for testing
+## CURL examples for testing Section:
 
 
 Merging PDFs files:
@@ -153,7 +153,7 @@ Always You must take in account:
    Prefer pure ASCII characteres    
 
 
-   ## Deploying in Windows server
+## Deploying in Windows server Section:
 
    On windows machines, the better approach is to have all binary files
    and its respective DLLs present into the same directory.  
@@ -198,7 +198,9 @@ Always You must take in account:
    these html files must be modified accordingly.
 
 
-   ## Deploying in linux server
+
+
+## Deploying in linux server Section:
 
    the pdftk must be installed in the linux systems, using the package manager
    For Debien and Ubuntu linux flavors you can run the followinf commands:  
@@ -207,4 +209,24 @@ Always You must take in account:
   
    For html2pdf it is better get the binary file that can be found in cmd/webapi folder 
 
-   ## Deploying using docker containers
+
+## Deploying using docker containers Section:
+
+   //todo yet ... 
+
+
+
+## Theankful Section:
+
+1. I am thankful for all people that make part of the wkhtnltopdf project. Without your good work, this project would be dificult to do.
+
+2. Also, Thankful for all people that make part of the pdftk project.
+Over here, the same we said about the wkhtmltopdf project is valid.
+Without your good work, this project would be difficult to do.  
+
+3. we are also thankful for the Gitpod Team. This project was written entirely using GItpod free tier resources. I did all my work without the necessity to install anything on my machine. Also, I used only a simple Internet Browser. I am an advocate of development in the Cloud in this strict way to do it. Gitpod is on the right path and this first project test had a positive result in that direction.  
+
+
+## Licences Section:  
+
+   // todo yet ...

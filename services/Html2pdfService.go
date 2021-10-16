@@ -12,7 +12,7 @@ import (
 )
 
 // Zip2Pdf executes the main peocess that converts a html file to a pdf file
-func Zip2Pdf(workdirName, filename string) (string, error) {
+func Html2Pdf(workdirName, filename string) (string, error) {
 
 	log.Default().Printf("[INFO] service Zip2Pdf was called. WorkDir= %s, File= %s", workdirName, filename)
 
