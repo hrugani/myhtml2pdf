@@ -112,16 +112,16 @@ high disk space consumming.
 
 
 Merging PDFs files:
-This curl command must be executed cmd/web/api directory as the current dir
+This curl command must be executed in the *cmd/web/api* directory as the current dir and inside it also is necessary to create a folder named *examples* and save into it a *pdf-merge-example-1.zip* file with all pdfs files that have to be merged.
 curl -X POST http://localhost:8080/merge?preffix=evol1234 \
-  -F files=@examples/pdf-example-1.zip \
+  -F files=@examples/pdf-merge-example-1.zip \
   -H "Content-Type: multipart/form-data" \
   -o merged.pdf
 
 Converting HTML to PDF:
-This curl command also must be executed cmd/web/api directory as the current dir
+This curl command also must be executed in *cmd/web/api* directory as the current dir and, inside it also it is necessary to create a folder named *examples* and save into it a *pdf-conversion-example-1.zip* file with all typical files that is necessary to execute a good html->pdf conversion.
 curl -X POST http://localhost:8080/html2pdf?preffix=evol1234 \
-  -F files=@examples/example-4.zip \
+  -F files=@examples/pdf-conversion-example-1.zip \
   -H "Content-Type: multipart/form-data" \
   -o converted.pdf
 
