@@ -9,12 +9,12 @@ Offers 2 endpoints:
 Both endpoints receive a zipped file that should contains all the necessary inputs
 to execute the desired pdf process.  
   
-This web app is only a wrapper for 2 execelent command lines applications that execute PDF actions.
+This web app is only a wrapper for 2 excelent command lines applications that perform PDF actions.
 For HTML to PDF convertion the wkhtmltopdf command line application is used.
 For PDF merging, the Application pdftk is used.
 We are very grateful to all developers that contributed to these 2 projects. Good job!!!!
 
-Both command line applications offer a lot of options that allow more complex tranformations.
+Both command line applications offer a lot of options that allows more complex tranformations.
 The mean goal of this project is a minimalist implementation  
 to reach the necessities of a specific company.
 So, here we spend efforts to make the things simple for some target use cases.
@@ -25,7 +25,7 @@ adapted to reach more generic goals.
 
 The system automatically will save in the mypdfservice_debug.log file detailed information abount all requestes in json format. 
 Then we can read programmatically the log file and parse it
-usdin any program language that has a paerser for json ( corrently
+using any program language that has a parser for json ( corrently
 all languages have good josn libraries for that).
 
 The file **mypdfservice_debug.log** is created automacally in the same folder where the executable **mypdfservice** binary file (in windows **mypdfservices.exe**) is located.
@@ -42,22 +42,21 @@ the characteres between ***mypdfservice-*** and ***.log.gz***
 represents the date/time when the new log file was created.
 
 The system also allows up to 20 old log files (the zipped ones).
-Finally, old log files the have more than 90 days age also will be deleted.
+Finally, old log files that have more than 90 days age also will be deleted.
 
 ## Additional Summary Logging Section:
 
 We can get an additional summary login file that capture all info that
-the system sends to the consule. A Summary of all http request the 
+the system sends to the console. A Summary of all http request the 
 receives. This infomation we have in more detaled way in the main
 log file **mypdfservices_debug.log**.
-The name of this second log file the user that starts the service 
-can decide in the command line used to start the service using
-redirecting from the commandline shell. (>).
+The name of this second log file, the user can specify at start time 
+using redirecting (from the commandline shell) (>).
 
 Ex: command line exemple for windows
 mypdfservices.exe > mysummary.log
 
-In this example, the name of the sumamary logging file will be mysummary.log and it will be located in the sam folder the command line have been executed.
+In this example, the name of the summary logging file will be mysummary.log and it will be located in the same folder the command line have been executed.
 
 Obs:
 Using the command line also is possible to change the TCP port
