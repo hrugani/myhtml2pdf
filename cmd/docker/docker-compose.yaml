@@ -1,0 +1,9 @@
+services:
+  myhtml2pdf:
+    build:
+      context: ../..
+      dockerfile: cmd/docker/Dockerfile
+    ports:
+      - "8080:8080"
+    container_name: myhtml2pdf
+    restart: unless-stopped

@@ -57,6 +57,22 @@ go run cmd/cli/main.go --help
 
 This will display the available commands and options for the CLI.
 
+## How to Deploy to Google Cloud Run
+
+This project can be deployed to Google Cloud Run using Google Cloud Build.
+
+1.  **Enable the Cloud Build and Cloud Run APIs** in your Google Cloud project.
+2.  **Set your project ID**:
+    ```bash
+    gcloud config set project YOUR_PROJECT_ID
+    ```
+3.  **Run the build**:
+    ```bash
+    gcloud builds submit --config cloudbuild.yaml .
+    ```
+
+This will build the container image, push it to Google Container Registry, and deploy it to Google Cloud Run.
+
 ## Available Services
 
 ### HTML to PDF Conversion

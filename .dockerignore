@@ -1,0 +1,9 @@
+.git
+.gitignore
+.gitpod.yml
+.vscode
+dist
+doc
+scripts
+zip-input-files-examples
+*.md
